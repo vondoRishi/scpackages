@@ -1,8 +1,24 @@
+#' Title
+#'
+#' @param path
+#' @param pMin.cells
+#' @param pMin.features
+#' @param markerGenes
+#' @param mitoPattern
+#' @param projectName
+#' @param cellRangerAggregated
+#'
+#' @return
+#' @export
+#'
+#' @import Seurat stringr
+#'
+#' @examples
 read10XwithMarkergenes <-  function(path,
            pMin.cells = 3, pMin.features = 20,
            markerGenes, mitoPattern = "^mt-",
            projectName, cellRangerAggregated =TRUE) {
-    
+
   if( dir.exists(path)){
     AGG.data <- Read10X(data.dir =  path )
   }else{
@@ -18,14 +34,17 @@ read10XwithMarkergenes <-  function(path,
     AGG[[paste("percent", genes, sep = ".")]] <-
       PercentageFeatureSet(AGG, pattern = paste("^", genes, "$", sep = ""))
   }
-  
+
   AGG@misc$messages <-list()
   AGG@misc$messages <- str_c(AGG@misc$messages, paste("Data loaded from",path),collapse = " ")
   AGG@misc$messages <- c(AGG@misc$messages, paste(capture.output(show(AGG)),collapse = "") )
+  group_by <- NULL
   if(cellRangerAggregated){
     AGG <- ExtractSamplesFromAggCellRanger(Object = AGG)
     AGG@misc$cellRangerAggregated <- cellRangerAggregated
+    group_by <- "sample"
   }
+  AGG <- QC_plot(AGG,group.by = group_by)
   return(AGG)
 }
 
@@ -36,13 +55,23 @@ ExtractSamplesFromAggCellRanger <- function(Object, splitBy="-") {
   return(Object)
 }
 
+#' Title
+#'
+#' @param Object
+#' @param group.by
+#'
+#' @return
+#' @export
+#'
+#' @import ggplot2 cowplot ggpubr
+#' @examples
 QC_plot <- function(Object, group.by = NULL) {
-  
+
   QC_umi_mito <-
     ggplot(Object[[]],
            aes(x = nCount_RNA, color = nFeature_RNA, y = percent.mito)) + geom_point() +
     theme(legend.position = "top")
-  
+
   QC_umi_gene <-
     ggplot(Object[[]],
            aes(x = nCount_RNA, y = nFeature_RNA, color = percent.mito)) + geom_point() +
@@ -56,15 +85,15 @@ QC_plot <- function(Object, group.by = NULL) {
                  alpha = 0.7, size = 0.2)+
     coord_flip()+
     ggpubr::fill_palette("jco")
-  
+
   p1 <- insert_xaxis_grob(QC_umi_gene, xdens, grid::unit(.2, "null"), position = "top")
   p2<- insert_yaxis_grob(p1, ydens, grid::unit(.2, "null"), position = "right")
   QC_umi_gene<- ggdraw(p2)
-  
-  
+
+
   Object@misc$QC_plot <-
     CombinePlots(plots = list(QC_umi_mito, QC_umi_gene))
-  
+
   if (is.null(group.by)) {
     Object@misc$QC_vln_plot <-
       VlnPlot(
@@ -81,12 +110,12 @@ QC_plot <- function(Object, group.by = NULL) {
         group.by = group.by
       )
   }
-  
+
   return(Object)
 }
 
 filterSeurat <-
-  function(Object, 
+  function(Object,
            mito.range = c(0, 100),
            gene_range = c(0, Inf),
            umi_range = c(0, Inf)) {
@@ -158,13 +187,13 @@ clusterMarkers <-  function(Object,
       only.pos = TRUE, min.pct = 0.25,
       thresh.use = 0.25, verbose = FALSE
     )
-  
+
   if (!is.null(marker_genes)) {
     markers_info <- left_join(markers_info,
                               marker_genes, by = c("gene" = "Symbol")) %>%
       replace_na(list(Gene_type = "Non marker"))
   }
-  
+
   if (!is.null(cell_cycle_genes)) {
     markers_info <-
       markers_info %>% left_join(cell_cycle_genes, by = c("gene" = "Symbol")) %>%
@@ -184,7 +213,7 @@ renameCluster <- function(ClusterInfo, Object) {
 
 
 pca_gene_loading <- function(Object) {
-  raw_pca_loading <- Loadings(Object[["pca"]]) 
+  raw_pca_loading <- Loadings(Object[["pca"]])
   max_pc<-colnames(raw_pca_loading)[apply(abs(raw_pca_loading),1,which.max)]
   raw_gene_pca_loading <- as.data.frame(cbind(Symbol=rownames(raw_pca_loading),PCA=max_pc))
   raw_gene_pca_loading <- raw_gene_pca_loading %>% mutate(pca_fix=as.numeric(substring(PCA,4)))
@@ -195,14 +224,14 @@ pca_gene_loading <- function(Object) {
 qc_regress_CellCycle<- function(Object,CellCycle_genes) {
   ### Check CC gene loadings
   Object <- RunPCA(Object, features = VariableFeatures(object = Object),verbose = FALSE)
-  
+
   raw_gene_pca_loading <- pca_gene_loading(Object)
-  
-  raw_gene_pca_loading <-  left_join(raw_gene_pca_loading,CellCycle_genes,  by = "Symbol") %>% 
+
+  raw_gene_pca_loading <-  left_join(raw_gene_pca_loading,CellCycle_genes,  by = "Symbol") %>%
     replace_na(list( Phase= "Not CC"))
-  
-  Object@misc$CC_pca_bar <- ggplot(subset(raw_gene_pca_loading, pca_fix <6),aes(x=factor(pca_fix)))+ 
-    geom_bar(aes(fill=Phase))+ 
+
+  Object@misc$CC_pca_bar <- ggplot(subset(raw_gene_pca_loading, pca_fix <6),aes(x=factor(pca_fix)))+
+    geom_bar(aes(fill=Phase))+
     ggtitle("CC genes on PCAs with default HVGs")+ theme(axis.text.x = element_text(angle = 90, hjust = 1))
   ### Check CC gene loadings
   ### CellCycleScoring
@@ -211,7 +240,7 @@ qc_regress_CellCycle<- function(Object,CellCycle_genes) {
       g2m.features = subset(CellCycle_genes, Phase == "M")$Symbol,
       set.ident = TRUE
     )
-  
+
   Object <- RunPCA(Object, verbose = FALSE,
                    features = subset(CellCycle_genes, Phase %in% c("S", "M"))$Symbol)
   Object@misc$before_cc_pca <- DimPlot(Object) + ggtitle("Before regressing out")
@@ -222,11 +251,11 @@ qc_regress_CellCycle<- function(Object,CellCycle_genes) {
     features = mvp_features,
     verbose = FALSE
   )
-  
+
   Object <- RunPCA( Object, verbose = FALSE,
       features = VariableFeatures(Object)
     )
-  
+
   Object@misc$after_cc_pca <- DimPlot(Object)+ ggtitle("After regressing out")
   ### regress out CC
   return(Object)
