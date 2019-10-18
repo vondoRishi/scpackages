@@ -12,7 +12,7 @@ report_QC <- function(obj_scRNA,title) {
       render(
         system.file("rmd_template", "QC_report.Rmd", package = "scpackages"),
         output_file = paste(title, format(Sys.time(), '%d_%B_%Y'), sep = "_"),
-        params = list(set_title = title)
+        params = list(set_title = title), output_dir = getwd()
     )
 }
 
