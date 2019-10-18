@@ -1,0 +1,23 @@
+---
+output: 
+  html_notebook: 
+    fig_caption: yes
+    toc: yes
+    toc_float: true
+date: "`r format(Sys.time(), '%d %B, %Y')`"    
+params:
+  set_title: "My Title!"
+title: "`r paste(params$set_title)`"
+---
+
+```{r echo=FALSE}
+obj_scRNA@misc$QC_plot
+obj_scRNA@misc$QC_vln_plot
+```
+
+### Additional info
+
+```{r echo=FALSE,message=FALSE}
+cat(obj_scRNA@misc$messages,sep = "\n *")
+```
+

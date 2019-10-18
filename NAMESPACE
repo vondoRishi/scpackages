@@ -2,8 +2,10 @@
 
 export(QC_plot)
 export(read10XwithMarkergenes)
+export(report_QC)
 import(Seurat)
 import(cowplot)
 import(ggplot2)
 import(ggpubr)
+import(rmarkdown)
 import(stringr)
