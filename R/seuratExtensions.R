@@ -181,16 +181,16 @@ topFeatures <- function(Object, selection.method, topN) {
 #' @examples
 pcaProcess <- function(Object, features,jackStraw= FALSE ){
   pDims = if(length(features) < 50 ) length(features) else 50
-  Object <-
-    RunPCA(
-      Object,npcs = pDims,
-      features = features
-    )
+  Object <-RunPCA( Object,
+                   npcs = pDims, features = features
+  )
   if(jackStraw){
-      Object <- JackStraw(Object, num.replicate = 100, dims = pDims, verbose = FALSE)
-      Object <- ScoreJackStraw(Object, dims = 1:pDims)
+    print("performing jackstraw")
+    Object <- JackStraw(Object, num.replicate = 100, dims = pDims, verbose = FALSE)
+    Object <- ScoreJackStraw(Object, dims = 1:pDims)
   }
-  Object@misc$elbowPlot <- ElbowPlot(placodeObj_fltred,ndims = pDims)
+  Object@misc$elbowPlot <- ElbowPlot(Object,ndims = pDims)
+  print(Object@misc$elbowPlot)
   return(Object)
 }
 
@@ -214,6 +214,8 @@ makeClusterSeurat <- function(Object, maxDims, res, identName=NULL){
     identName<-paste("Ident",maxDims,res,sep = "_")
   }
   Object[[identName]]<- Idents(Object)
+  Object@misc$umapPlot <- DimPlot(Object, reduction = "umap",label = TRUE)+NoLegend()
+  print(Object@misc$umapPlot)
   return(Object)
 }
 
@@ -224,17 +226,15 @@ makeClusterSeurat <- function(Object, maxDims, res, identName=NULL){
 #' @param cell_cycle_genes
 #'
 #' @return
-#' @export
 #'
 #' @import Seurat dplyr
 #'
 #' @examples
-clusterMarkers <-  function(Object, marker_genes = NULL,
-                            cell_cycle_genes = NULL) {
+clusterMarkers <-  function(Object, marker_genes = NULL) { #,cell_cycle_genes = NULL) {
   markers_info <-  FindAllMarkers( object = Object,
-      only.pos = TRUE, min.pct = 0.25,
-      thresh.use = 0.25, verbose = FALSE
-    )
+                                   only.pos = TRUE, min.pct = 0.25,
+                                   thresh.use = 0.25, verbose = FALSE
+                                   )
 
   if (!is.null(marker_genes)) {
     markers_info <- left_join(markers_info,
@@ -242,11 +242,11 @@ clusterMarkers <-  function(Object, marker_genes = NULL,
       replace_na(list(Gene_type = "Non marker"))
   }
 
-  if (!is.null(cell_cycle_genes)) {
-    markers_info <-
-      markers_info %>% left_join(cell_cycle_genes, by = c("gene" = "Symbol")) %>%
-      replace_na(list(Phase = "Not CC", Gene_type = "Non marker"))
-  }
+  # if (!is.null(cell_cycle_genes)) {
+  #   markers_info <-
+  #     markers_info %>% left_join(cell_cycle_genes, by = c("gene" = "Symbol")) %>%
+  #     replace_na(list(Phase = "Not CC", Gene_type = "Non marker"))
+  # }
   return(markers_info)
 }
 
@@ -261,12 +261,22 @@ clusterMarkers <-  function(Object, marker_genes = NULL,
 #' @import Seurat dplyr
 #'
 #' @examples
-renameCluster <- function(ClusterInfo, Object) {
-  varCluster_top <- ClusterInfo %>% group_by(cluster) %>% top_n(10, avg_logFC)
-  cluster_rename <- as.data.frame(table(varCluster_top$Gene_type,varCluster_top$cluster)) %>% group_by(Var2) %>% filter(Freq== max(Freq))
-  new.name <- paste(cluster_rename$Var1, cluster_rename$Var2, sep="-")
-  names(new.name) <- levels(placodeObj_fltred)
-  Object <- RenameIdents(Object,new.name)
+renameCluster <- function(ClusterInfo, Object, topN=10) {
+  varCluster_top <-    ClusterInfo %>% group_by(cluster) %>% top_n(topN, avg_logFC)
+  cluster_rename <- as.data.frame( table( varCluster_top$Gene_type, varCluster_top$cluster)) %>%
+    group_by(Var2) %>% filter(Freq == max(Freq))
+   new.name <-  paste(cluster_rename$Var2,
+                     cluster_rename$Var1,
+                     as.vector(table(Idents(Object))),
+                     sep = "-")
+  names(new.name) <- levels(Object)
+  Object <- RenameIdents(Object, new.name)
+  # name_size <- paste(levels(Object), as.vector(table(Idents(Object))), sep = ":")
+  # names(name_size) <- levels(Object)
+  # Object <- RenameIdents(Object, name_size)
+
+  Object@misc$umapPlot <- DimPlot(Object, reduction = "umap",label = TRUE)+NoLegend()
+  print(Object@misc$umapPlot)
   return(Object)
 }
 

@@ -4,10 +4,13 @@
 \alias{clusterMarkers}
 \title{Title}
 \usage{
-clusterMarkers(Object, marker_genes = NULL, cell_cycle_genes = NULL)
+clusterMarkers(Object, marker_genes = NULL)
 }
 \arguments{
 \item{cell_cycle_genes}{}
+}
+\value{
+
 }
 \description{
 Title
