@@ -342,24 +342,20 @@ qc_regress_CellCycle<- function(Object,CellCycle_genes) {
 #' @import Seurat
 #'
 #' @examples
-normScaleHVG <- function(Object,verbose =TRUE) {
-  print("Normalizing")
+normScaleHVG <- function(Object,verbose =TRUE,...) {
+  # print("Normalizing")
   Object <- NormalizeData(    Object,
     normalization.method = "LogNormalize",
-    scale.factor = 10000,
-    verbose = FALSE
+    ...
   )
 
-  print("Finding Variable Features")
-  Object <- FindVariableFeatures(Object, selection.method = "vst", verbose = TRUE)
+  Object <- FindVariableFeatures(Object, selection.method = "vst", ...)
   vst_features <-VariableFeatures(Object,selection.method = "vst")
   Object@misc$hvgPlot <- topVariableFeaturePlot(Object,10)
   print(Object@misc$hvgPlot)
 
-  print("scaling")
   Object <-  ScaleData(Object,features = vst_features,
-                       vars.to.regress = c("percent.mito","nCount_RNA"),
-                       verbose = TRUE
+                       vars.to.regress = c("percent.mito","nCount_RNA"),...
   )
 }
 
