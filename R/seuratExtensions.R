@@ -288,21 +288,23 @@ pca_gene_loading <- function(Object) {
 #' @return
 #' @export
 #'
-#' @import Seurat dplyr
+#' @import Seurat dplyr tidyr
 #'
 #' @examples
 qc_regress_CellCycle<- function(Object,CellCycle_genes) {
   ### Check CC gene loadings
-  Object <- RunPCA(Object, features = VariableFeatures(object = Object),verbose = FALSE)
+  print("Checking Cell cycle gene loadings on PCs")
+  Object <- RunPCA(Object, features = VariableFeatures(object = Object), verbose = FALSE)
 
   raw_gene_pca_loading <- pca_gene_loading(Object)
 
   raw_gene_pca_loading <-  left_join(raw_gene_pca_loading,CellCycle_genes,  by = "Symbol") %>%
     replace_na(list( Phase= "Not CC"))
 
-  Object@misc$CC_pca_bar <- ggplot(subset(raw_gene_pca_loading, pca_fix <6),aes(x=factor(pca_fix)))+
+  Object@misc$CC_pca_bar <- ggplot(subset(raw_gene_pca_loading, pca_fix <11),aes(x=factor(pca_fix)))+
     geom_bar(aes(fill=Phase))+
     ggtitle("CC genes on PCAs with default HVGs")+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+theme_bw()
+  print(Object@misc$CC_pca_bar)
   ### Check CC gene loadings
   ### CellCycleScoring
   Object <-CellCycleScoring(Object,
@@ -311,22 +313,27 @@ qc_regress_CellCycle<- function(Object,CellCycle_genes) {
       set.ident = TRUE
     )
 
+  print("Running PCA with only cell-cycle genes")
   Object <- RunPCA(Object, verbose = FALSE,
                    features = subset(CellCycle_genes, Phase %in% c("S", "M"))$Symbol)
   Object@misc$before_cc_pca <- DimPlot(Object)+theme_bw() + ggtitle("Before regressing out")
+  print(Object@misc$before_cc_pca)
   ### CellCycleScoring
   ### regress out CC
+  print("Regressing out")
   Object <- ScaleData(Object,
     vars.to.regress = c("S.Score", "G2M.Score", "percent.mito", "nCount_RNA"),
-    features = mvp_features,
+    features = VariableFeatures(Object),
     verbose = FALSE
   )
 
+  print("Checking Cell cycle gene loadings on PCs after regressing out")
   Object <- RunPCA( Object, verbose = FALSE,
       features = VariableFeatures(Object)
     )
 
   Object@misc$after_cc_pca <- DimPlot(Object)+theme_bw() + ggtitle("After regressing out")
+  print(Object@misc$after_cc_pca)
   ### regress out CC
   return(Object)
 }
@@ -342,20 +349,21 @@ qc_regress_CellCycle<- function(Object,CellCycle_genes) {
 #' @import Seurat
 #'
 #' @examples
-normScaleHVG <- function(Object,verbose =TRUE,...) {
+normScaleHVG <- function(Object,seuratVerbose =TRUE,...) {
   # print("Normalizing")
-  Object <- NormalizeData(    Object,
-    normalization.method = "LogNormalize",
+  Object <- NormalizeData(Object,
+    normalization.method = "LogNormalize", verbose = seuratVerbose,
     ...
   )
 
-  Object <- FindVariableFeatures(Object, selection.method = "vst", ...)
-  vst_features <-VariableFeatures(Object,selection.method = "vst")
+  Object <- FindVariableFeatures(Object, selection.method = "vst", verbose = seuratVerbose, ...)
+  vst_features <-VariableFeatures(Object)
   Object@misc$hvgPlot <- topVariableFeaturePlot(Object,10)
   print(Object@misc$hvgPlot)
 
   Object <-  ScaleData(Object,features = vst_features,
-                       vars.to.regress = c("percent.mito","nCount_RNA"),...
+                       vars.to.regress = c("percent.mito","nCount_RNA"),
+                       verbose = seuratVerbose, ...
   )
 }
 

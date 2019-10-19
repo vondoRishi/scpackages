@@ -4,7 +4,7 @@
 \alias{normScaleHVG}
 \title{Title}
 \usage{
-normScaleHVG(Object, verbose = TRUE)
+normScaleHVG(Object, seuratVerbose = TRUE, ...)
 }
 \arguments{
 \item{Object}{}
