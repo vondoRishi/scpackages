@@ -4,7 +4,7 @@
 \alias{renameCluster}
 \title{Title}
 \usage{
-renameCluster(ClusterInfo, Object)
+renameCluster(ClusterInfo, Object, topN = 10)
 }
 \arguments{
 \item{Object}{}

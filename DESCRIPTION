@@ -1,7 +1,7 @@
 Package: scpackages
 Type: Package
 Title: scpackages has many single-cell R and python packages to make easier to use them easily.
-Version: 0.2.4
+Version: 0.2.5
 Author: Rishi Das Roy <rishi.dasroy@gmail.com>
 Maintainer: Rishi Das Roy <rishi.dasroy@helsinki.fi>
 Description: Integrates common single cell R and Python packages in one place.
@@ -16,7 +16,8 @@ Imports:
     ggpubr,
     stringr,
     dplyr,
-    rmarkdown
+    rmarkdown,
+    tidyr
 RoxygenNote: 6.1.1
 URL: https://github.com/vondoRishi/scpackages
 BugReports: https://github.com/vondoRishi/scpackages/issues
