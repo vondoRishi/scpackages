@@ -339,7 +339,7 @@ qc_regress_CellCycle<- function(Object,CellCycle_genes) {
 #' @return
 #' @export
 #'
-#' import Seurat
+#' @import Seurat
 #'
 #' @examples
 normScaleHVG <- function(Object,verbose =TRUE) {
