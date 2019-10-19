@@ -4,7 +4,7 @@
 \alias{read10XwithMarkergenes}
 \title{Title}
 \usage{
-read10XwithMarkergenes(path, pMin.cells = 3, pMin.features = 20,
+read10XwithMarkergenes(tenxPath, pMin.cells = 3, pMin.features = 20,
   markerGenes, mitoPattern = "^mt-", projectName,
   cellRangerAggregated = TRUE)
 }

@@ -1,6 +1,6 @@
 #' Title
 #'
-#' @param path
+#' @param tenxPath
 #' @param pMin.cells
 #' @param pMin.features
 #' @param markerGenes
@@ -14,7 +14,7 @@
 #' @import Seurat stringr
 #'
 #' @examples
-read10XwithMarkergenes <-  function(path,
+read10XwithMarkergenes <-  function(tenxPath,
            pMin.cells = 3, pMin.features = 20,
            markerGenes, mitoPattern = "^mt-",
            projectName, cellRangerAggregated =TRUE) {
@@ -70,12 +70,12 @@ QC_plot <- function(Object, group.by = NULL) {
   QC_umi_mito <-
     ggplot(Object[[]],
            aes(x = nCount_RNA, color = nFeature_RNA, y = percent.mito)) + geom_point() +
-    theme(legend.position = "top")
+    theme(legend.position = "top")+theme_bw()
 
   QC_umi_gene <-
     ggplot(Object[[]],
            aes(x = nCount_RNA, y = nFeature_RNA, color = percent.mito)) + geom_point() +
-    theme(legend.position = "top")
+    theme(legend.position = "top") +theme_bw()
   xdens <- axis_canvas(QC_umi_gene, axis = "x")+
     geom_density(data = Object[[]], aes(x = nCount_RNA, fill = !!sym(group.by)),
                  alpha = 0.7, size = 0.2)+
@@ -114,6 +114,19 @@ QC_plot <- function(Object, group.by = NULL) {
   return(Object)
 }
 
+#' Title
+#'
+#' @param Object
+#' @param mito.range
+#' @param gene_range
+#' @param umi_range
+#'
+#' @return
+#' @export
+#'
+#' @import Seurat
+#'
+#' @examples
 filterSeurat <-
   function(Object,
            mito.range = c(0, 100),
@@ -154,6 +167,18 @@ topFeatures <- function(Object, selection.method, topN) {
   }
 }
 
+#' Title
+#'
+#' @param Object
+#' @param features
+#' @param jackStraw
+#'
+#' @return
+#' @export
+#'
+#' @import Seurat
+#'
+#' @examples
 pcaProcess <- function(Object, features,jackStraw= FALSE ){
   pDims = if(length(features) < 50 ) length(features) else 50
   Object <-
@@ -169,6 +194,18 @@ pcaProcess <- function(Object, features,jackStraw= FALSE ){
   return(Object)
 }
 
+#' Title
+#'
+#' @param Object
+#' @param maxDims
+#' @param res
+#' @param identName
+#'
+#' @return
+#' @export
+#'
+#' @import Seurat
+#' @examples
 makeClusterSeurat <- function(Object, maxDims, res, identName=NULL){
   Object <- FindNeighbors(Object, dims = 1:maxDims)
   Object <- FindClusters(Object, resolution = res, verbose = FALSE)
@@ -180,8 +217,19 @@ makeClusterSeurat <- function(Object, maxDims, res, identName=NULL){
   return(Object)
 }
 
-clusterMarkers <-  function(Object,
-                            marker_genes = NULL,
+#' Title
+#'
+#' @param Object
+#' @param marker_genes
+#' @param cell_cycle_genes
+#'
+#' @return
+#' @export
+#'
+#' @import Seurat dplyr
+#'
+#' @examples
+clusterMarkers <-  function(Object, marker_genes = NULL,
                             cell_cycle_genes = NULL) {
   markers_info <-  FindAllMarkers( object = Object,
       only.pos = TRUE, min.pct = 0.25,
@@ -202,6 +250,17 @@ clusterMarkers <-  function(Object,
   return(markers_info)
 }
 
+#' Title
+#'
+#' @param ClusterInfo
+#' @param Object
+#'
+#' @return
+#' @export
+#'
+#' @import Seurat dplyr
+#'
+#' @examples
 renameCluster <- function(ClusterInfo, Object) {
   varCluster_top <- ClusterInfo %>% group_by(cluster) %>% top_n(10, avg_logFC)
   cluster_rename <- as.data.frame(table(varCluster_top$Gene_type,varCluster_top$cluster)) %>% group_by(Var2) %>% filter(Freq== max(Freq))
@@ -221,6 +280,17 @@ pca_gene_loading <- function(Object) {
 }
 
 
+#' Title
+#'
+#' @param Object
+#' @param CellCycle_genes
+#'
+#' @return
+#' @export
+#'
+#' @import Seurat dplyr
+#'
+#' @examples
 qc_regress_CellCycle<- function(Object,CellCycle_genes) {
   ### Check CC gene loadings
   Object <- RunPCA(Object, features = VariableFeatures(object = Object),verbose = FALSE)
@@ -232,7 +302,7 @@ qc_regress_CellCycle<- function(Object,CellCycle_genes) {
 
   Object@misc$CC_pca_bar <- ggplot(subset(raw_gene_pca_loading, pca_fix <6),aes(x=factor(pca_fix)))+
     geom_bar(aes(fill=Phase))+
-    ggtitle("CC genes on PCAs with default HVGs")+ theme(axis.text.x = element_text(angle = 90, hjust = 1))
+    ggtitle("CC genes on PCAs with default HVGs")+ theme(axis.text.x = element_text(angle = 90, hjust = 1))+theme_bw()
   ### Check CC gene loadings
   ### CellCycleScoring
   Object <-CellCycleScoring(Object,
@@ -243,7 +313,7 @@ qc_regress_CellCycle<- function(Object,CellCycle_genes) {
 
   Object <- RunPCA(Object, verbose = FALSE,
                    features = subset(CellCycle_genes, Phase %in% c("S", "M"))$Symbol)
-  Object@misc$before_cc_pca <- DimPlot(Object) + ggtitle("Before regressing out")
+  Object@misc$before_cc_pca <- DimPlot(Object)+theme_bw() + ggtitle("Before regressing out")
   ### CellCycleScoring
   ### regress out CC
   Object <- ScaleData(Object,
@@ -256,7 +326,46 @@ qc_regress_CellCycle<- function(Object,CellCycle_genes) {
       features = VariableFeatures(Object)
     )
 
-  Object@misc$after_cc_pca <- DimPlot(Object)+ ggtitle("After regressing out")
+  Object@misc$after_cc_pca <- DimPlot(Object)+theme_bw() + ggtitle("After regressing out")
   ### regress out CC
   return(Object)
+}
+
+
+#' Title
+#'
+#' @param Object
+#'
+#' @return
+#' @export
+#'
+#' import Seurat
+#'
+#' @examples
+normScaleHVG <- function(Object,verbose =TRUE) {
+  print("Normalizing")
+  Object <- NormalizeData(    Object,
+    normalization.method = "LogNormalize",
+    scale.factor = 10000,
+    verbose = FALSE
+  )
+
+  print("Finding Variable Features")
+  Object <- FindVariableFeatures(Object, selection.method = "vst", verbose = TRUE)
+  vst_features <-VariableFeatures(Object,selection.method = "vst")
+  Object@misc$hvgPlot <- topVariableFeaturePlot(Object,10)
+  print(Object@misc$hvgPlot)
+
+  print("scaling")
+  Object <-  ScaleData(Object,features = vst_features,
+                       vars.to.regress = c("percent.mito","nCount_RNA"),
+                       verbose = TRUE
+  )
+}
+
+topVariableFeaturePlot <- function(Object, topN){
+  topGenes <- head(VariableFeatures(Object), topN)
+
+  plot1 <- VariableFeaturePlot(Object)
+  return(LabelPoints(plot = plot1, points = topGenes, repel = TRUE))
 }
