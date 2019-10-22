@@ -59,7 +59,7 @@ Max `r obj_scRNA@misc$maxPca` principal component and resolution `r obj_scRNA@mi
 ```{r echo=FALSE}
 obj_scRNA@misc$umapPlot
 if(!is.null(obj_scRNA@misc$markers_info) ){
-  DT::datatable(round_df(obj_scRNA@misc$markers_info,digital=6), rownames = FALSE)
+  DT::datatable(round_df(obj_scRNA@misc$markers_info,digits = 6), rownames = FALSE)
 }
 ```
 
