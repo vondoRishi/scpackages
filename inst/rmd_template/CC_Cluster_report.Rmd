@@ -20,7 +20,7 @@ obj_scRNA@misc$hvgPlot
 <div id="BlockName" class="collapse">  
 
 ```{r echo=FALSE}
-VariableFeatures(object = Object)
+VariableFeatures(object = obj_scRNA)
 ```
 
 </div>   
@@ -67,7 +67,10 @@ if(!is.null(obj_scRNA@misc$markers_info) ){
   
 ### Command History
 
+<button class="btn btn-primary" data-toggle="collapse" data-target="#blockHis"> Show/Hide </button>  List of selected variable genes.
+<div id="blockHis" class="collapse">  
 ```{r echo=FALSE,message=FALSE}
-cat(obj_scRNA@commands,sep = "\n *")
+obj_scRNA@commands
 ```
 
+</div>
