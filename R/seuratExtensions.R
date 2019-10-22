@@ -133,9 +133,9 @@ filterSeurat <-
            gene_range = c(0, Inf),
            umi_range = c(0, Inf)) {
     filter_message = paste(
-      "Keeping cells with mitochndrial genes between",paste(mito.range, collapse = ","),"%",
-      " gene count within",paste(gene_range, collapse = ","),
-      " and umi count within",paste(umi_range, collapse = ","),sep = ""
+      "Keeping cells with mitochndrial genes between ",paste(mito.range, collapse = ","),"%",
+      " gene count within ",paste(gene_range, collapse = ","),
+      " and umi count within ",paste(umi_range, collapse = ","),sep = ""
     )
     Object@misc$messages <- c(Object@misc$messages, filter_message )
     x<-  subset(Object[[]],
@@ -210,6 +210,9 @@ makeClusterSeurat <- function(Object, maxDims, res, identName=NULL){
   Object <- FindNeighbors(Object, dims = 1:maxDims)
   Object <- FindClusters(Object, resolution = res, verbose = FALSE)
   Object <- RunUMAP(Object, dims = 1:maxDims, verbose = FALSE)
+  Object@misc$maxPca <- maxDims
+  Object@misc$resolution <- res
+
   if(is.null(identName)){
     identName<-paste("Ident",maxDims,res,sep = "_")
   }

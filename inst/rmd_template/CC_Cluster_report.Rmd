@@ -1,0 +1,73 @@
+---
+output: 
+  html_notebook: 
+    fig_caption: yes
+    toc: yes
+    toc_float: true
+date: "`r format(Sys.time(), '%d %B, %Y')`"    
+params:
+  set_title: "My Title!"
+title: "`r paste(params$set_title)`"
+---
+
+# Highly variable features
+
+```{r echo=FALSE}
+obj_scRNA@misc$hvgPlot
+```
+
+<button class="btn btn-primary" data-toggle="collapse" data-target="#BlockName"> Show/Hide </button>  List of selected variable genes.
+<div id="BlockName" class="collapse">  
+
+```{r echo=FALSE}
+VariableFeatures(object = Object)
+```
+
+</div>   
+   
+## Cell cycle
+
+### Loading on PC
+
+Are principal component loaded with cell cycle genes?
+
+```{r echo=FALSE}
+obj_scRNA@misc$CC_pca_bar
+```
+
+#### Before regressing out
+```{r echo=FALSE}
+obj_scRNA@misc$before_cc_pca
+```
+
+#### After regressing out
+```{r echo=FALSE}
+obj_scRNA@misc$after_cc_pca 
+```
+
+## Cluster
+
+### Pca analysis
+```{r echo=FALSE}
+obj_scRNA@misc$elbowPlot
+```
+
+Max `r obj_scRNA@misc$maxPca` principal component and resolution `r obj_scRNA@misc$resolution` selected.
+
+### Dimensional reduction
+
+```{r echo=FALSE}
+obj_scRNA@misc$umapPlot
+if(!is.null(obj_scRNA@misc$markers_info) ){
+  DT::datatable(round_df(obj_scRNA@misc$markers_info,digital=6), rownames = FALSE)
+}
+```
+
+  
+  
+### Command History
+
+```{r echo=FALSE,message=FALSE}
+cat(obj_scRNA@commands,sep = "\n *")
+```
+
