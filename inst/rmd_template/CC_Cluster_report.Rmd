@@ -20,7 +20,7 @@ obj_scRNA@misc$hvgPlot
 <div id="BlockName" class="collapse">  
 
 ```{r echo=FALSE}
-VariableFeatures(object = Object)
+VariableFeatures(object = obj_scRNA)
 ```
 
 </div>   
