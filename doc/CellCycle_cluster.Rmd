@@ -1,0 +1,135 @@
+---
+title: "Process Seurat Object"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{CellCycle_cluster}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup,message=FALSE}
+library(scpackages)
+```
+
+
+## Process Seurat Object for clustering
+
+First we will load saved seurat object from disk.
+
+```{r readSeurat,warning=FALSE,fig.width=8,fig.height=6}
+seuratObj <- readRDS("/home/dasroy/data/Project/scpackages/1k_Brain_E18_Mm.23_October_2019.rds")
+```
+
+
+## 3-in-1
+There are three steps need to do at first ; which are 
+
++ Normalization 
++ VariableFeatures (find variable genes) 
++ ScaleData  
+
+These steps can be done by a single method with default values. It will also genarate **VariableFeaturePlot**. Only the variable features will be scaled as those are only required as input for PCA. 
+
+**Note** We can pass any parameter of above "Seurat" functions to below function. 
+Here in this example __nfeatures__ belongs to **VariableFeatures** .
+```{r normScaleHVG,warning=FALSE,fig.width=8,fig.height=6}
+seuratObj <- normScaleHVG(seuratObj,seuratVerbose = FALSE,nfeatures=1000)
+```
+
+## CellCycle 
+Next we will check 
+```{r CellCycle,message=FALSE,warning=FALSE,fig.width=8,fig.height=6}
+# cell_cycle_genes <- read.csv("inst/extdata/cell_cycle_genes.csv")
+library(readr)
+cell_cycle_genes <- read_csv(system.file("extdata", "cell_cycle_genes.csv", package = "scpackages"))
+cell_cycle_genes
+```
+
+
+**NOTE** cell_cycle_genes should have columns "Symbol" for gene names and "Phase" with values (S and M) for cell-cycle phases  
+
+### Regression
+At this step we will check 
+
++ Principal components(PC) are loaded with cell-cycle (CC) genes.
++ PCA plot with CC genes
++ regressing out CC effect with Seurat method **CellCycleScoring**
++ Again PCA plot with CC genes 
+
+```{r CellCycle_regress,message=FALSE,warning=FALSE,fig.width=8,fig.height=6}
+seuratObj <-qc_regress_CellCycle(seuratObj, cell_cycle_genes)
+```
+
+
+Plots will be saved in this following slots.
+
++ 'seuratObj@misc$CC_pca_bar'
+
++ 'seuratObj@misc$before_cc_pca'
+
++ 'seuratObj@misc$after_cc_pca'
+
+
+## Cluster
+
+### Elbowplot
+
+```{r Elbowplot,message=FALSE,warning=FALSE,fig.width=8,fig.height=6}
+seuratObj <- pcaProcess(seuratObj,features = VariableFeatures(seuratObj),jackStraw = FALSE)
+# seuratObj@misc$elbowPlot
+```
+
+### Clustering
+```{r Clustering,message=FALSE,warning=FALSE,fig.width=8,fig.height=6}
+seuratObj <- makeClusterSeurat(seuratObj,maxDims = 20, res = 0.5)
+# seuratObj@misc$umapPlot
+```
+
+
+
+### Cluster markers
+```{r Clustering_markers,message=FALSE,warning=FALSE,fig.width=8,fig.height=6}
+markers_info <-  FindAllMarkers( object = seuratObj,
+                                 only.pos = TRUE, min.pct = 0.25,
+                                 thresh.use = 0.25, verbose = FALSE )
+head(markers_info)
+```
+
+
+
+#### Cell type information
+
+Dummy cell type info. This data source must have two columns "Symbol" and "Gene_type"
+```{r Dummy,message=FALSE,warning=FALSE,fig.width=8,fig.height=6}
+marker_gene <- read_csv("/home/dasroy/data/Project/GeneExpression/scrna_workflow/marker_genes.csv")
+marker_gene <- marker_gene[!duplicated(marker_gene$Symbol),]
+head(marker_gene)
+```
+
+#### Annotation
+```{r Annotation,message=FALSE,warning=FALSE,fig.width=8,fig.height=6}
+library(dplyr)
+markers_info <- left_join(markers_info,marker_gene, 
+                          by = c("gene" = "Symbol")) %>% 
+    replace_na(list(Gene_type = "Non skin"))
+
+# Storing the info 
+seuratObj@misc$markers_info <- markers_info
+
+```
+
+
+#### Rename clusters
+```{r Rename,message=FALSE,warning=FALSE,fig.width=8,fig.height=6}
+seuratObj <- renameCluster(ClusterInfo = markers_info, Object = seuratObj)
+```
+
+We used genes which should express in developing skin and hence all the clusters are marked with non-skin genes. The third field of the cluster names reflect the cluster sizes.
+
+## Report 
+It will genarate report and save seuratObj with filenames begining with **title** and ending with date_stamp.
+
+```{r report,message=FALSE,warning=FALSE,fig.width=8,fig.height=6}
+report_Cluster(obj_scRNA = seuratObj,title = "scaled_cluster")
+```
+
