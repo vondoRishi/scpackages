@@ -1,0 +1,50 @@
+---
+title: "Read and Filter 10x data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ReadFilter10x}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup,message=FALSE,warning=FALSE}
+library(scpackages)
+```
+
+In this example we use the 10x data dowloaded from [here](https://support.10xgenomics.com/single-cell-gene-expression/datasets/2.1.0/neurons_900)
+
+## Initialize and QC
+
+First initialize and QC Seurat object with single command. This will also genarate QC plots
+
+```{r warning=FALSE,fig.width=8,fig.height=6}
+seurat_Obj <- read10XwithMarkergenes(
+    tenxPath =  "/tmp/filtered_gene_bc_matrices/mm10/",
+    pMin.cells = 3,
+    pMin.features = 20,
+    markerGenes = NULL,
+    projectName = "1k_Brain_E18_Mm", 
+    cellRangerAggregated = FALSE # If 10x data are aggrgated
+)
+```
+
+## Filter
+
+Now after inspecting the QC plots we want to keep good quality cells only. That can be done with following commands.
+
+```{r filter,warning=FALSE,fig.width=8,fig.height=6}
+seurat_Obj <- filterSeurat(seurat_Obj, 
+                           mito.range = c(0, 5), # Cells with mitochondrial genes 0-5%
+                           gene_range = c(1000,Inf) # Cells with more than 1000 genes 
+                           )
+```
+
+## Report
+
+The above commands can be run with different parameters or there could be several samples. It could be difficult to make separate markdown file for each object. Therefore we will use following command to genearate markdown notes about the above resuts and save "seurat_obj" for future use.
+
+```{r report,message=FALSE,warning=FALSE,fig.width=8,fig.height=6}
+report_QC(obj_scRNA = seurat_Obj,title = "1k_Brain_E18_Mm")
+```
+
+This will generate **1k_Brain_E18_Mm_currentDate.nb.html** report with all information and figures. Additionally, it will also save **seurat_Obj** as 1k_Brain_E18_Mm_currentDate.rds for future use.
