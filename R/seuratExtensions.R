@@ -19,10 +19,10 @@ read10XwithMarkergenes <-  function(tenxPath,
            markerGenes, mitoPattern = "^mt-",
            projectName, cellRangerAggregated =TRUE) {
 
-  if( dir.exists(path)){
-    AGG.data <- Read10X(data.dir =  path )
+  if( dir.exists(tenxPath)){
+    AGG.data <- Read10X(data.dir =  tenxPath )
   }else{
-    AGG.data <- Read10X_h5(filename = path )
+    AGG.data <- Read10X_h5(filename = tenxPath )
   }
   AGG <- CreateSeuratObject( counts = AGG.data,
                              min.cells = pMin.cells,
@@ -36,7 +36,7 @@ read10XwithMarkergenes <-  function(tenxPath,
   }
 
   AGG@misc$messages <-list()
-  AGG@misc$messages <- str_c(AGG@misc$messages, paste("Data loaded from",path),collapse = " ")
+  AGG@misc$messages <- str_c(AGG@misc$messages, paste("Data loaded from",tenxPath),collapse = " ")
   AGG@misc$messages <- c(AGG@misc$messages, paste(capture.output(show(AGG)),collapse = "") )
   group_by <- NULL
   if(cellRangerAggregated){
@@ -45,6 +45,8 @@ read10XwithMarkergenes <-  function(tenxPath,
     group_by <- "sample"
   }
   AGG <- QC_plot(AGG,group.by = group_by)
+  print(AGG@misc$QC_plot)
+  print(AGG@misc$QC_vln_plot)
   return(AGG)
 }
 
@@ -76,15 +78,28 @@ QC_plot <- function(Object, group.by = NULL) {
     ggplot(Object[[]],
            aes(x = nCount_RNA, y = nFeature_RNA, color = percent.mito)) + geom_point() +
     theme(legend.position = "top") +theme_bw()
-  xdens <- axis_canvas(QC_umi_gene, axis = "x")+
-    geom_density(data = Object[[]], aes(x = nCount_RNA, fill = !!sym(group.by)),
-                 alpha = 0.7, size = 0.2)+
-    ggpubr::fill_palette("jco")
-  ydens <- axis_canvas(QC_umi_gene, axis = "y", coord_flip = TRUE)+
-    geom_density(data = Object[[]], aes(x = nFeature_RNA, fill = !!sym(group.by)),
-                 alpha = 0.7, size = 0.2)+
-    coord_flip()+
-    ggpubr::fill_palette("jco")
+  if (is.null(group.by)) {
+    xdens <- axis_canvas(QC_umi_gene, axis = "x")+
+      geom_density(data = Object[[]], aes(x = nCount_RNA),
+                   alpha = 0.7, size = 0.2)+
+      ggpubr::fill_palette("jco")
+    ydens <- axis_canvas(QC_umi_gene, axis = "y", coord_flip = TRUE)+
+      geom_density(data = Object[[]], aes(x = nFeature_RNA),
+                   alpha = 0.7, size = 0.2)+
+      coord_flip()+
+      ggpubr::fill_palette("jco")
+  }else {
+    xdens <- axis_canvas(QC_umi_gene, axis = "x")+
+      geom_density(data = Object[[]], aes(x = nCount_RNA, fill = !!sym(group.by)),
+                   alpha = 0.7, size = 0.2)+
+      ggpubr::fill_palette("jco")
+    ydens <- axis_canvas(QC_umi_gene, axis = "y", coord_flip = TRUE)+
+      geom_density(data = Object[[]], aes(x = nFeature_RNA, fill = !!sym(group.by)),
+                   alpha = 0.7, size = 0.2)+
+      coord_flip()+
+      ggpubr::fill_palette("jco")
+  }
+
 
   p1 <- insert_xaxis_grob(QC_umi_gene, xdens, grid::unit(.2, "null"), position = "top")
   p2<- insert_yaxis_grob(p1, ydens, grid::unit(.2, "null"), position = "right")
@@ -135,8 +150,9 @@ filterSeurat <-
     filter_message = paste(
       "Keeping cells with mitochndrial genes between ",paste(mito.range, collapse = ","),"%",
       " gene count within ",paste(gene_range, collapse = ","),
-      " and umi count within ",paste(umi_range, collapse = ","),sep = ""
+      " and umi count within ",paste(umi_range, collapse = ","),sep = " "
     )
+    print(filter_message)
     Object@misc$messages <- c(Object@misc$messages, filter_message )
     x<-  subset(Object[[]],
                 percent.mito > min(mito.range) &
@@ -369,12 +385,12 @@ normScaleHVG <- function(Object,seuratVerbose =TRUE,...) {
     ...
   )
 
-  Object <- FindVariableFeatures(Object, selection.method = "vst", verbose = seuratVerbose, ...)
-  vst_features <-VariableFeatures(Object)
+  Object <- FindVariableFeatures(Object,  verbose = seuratVerbose, ...)
+  variable_features <-VariableFeatures(Object)
   Object@misc$hvgPlot <- topVariableFeaturePlot(Object,10)
   print(Object@misc$hvgPlot)
 
-  Object <-  ScaleData(Object,features = vst_features,
+  Object <-  ScaleData(Object,features = variable_features,
                        vars.to.regress = c("percent.mito","nCount_RNA"),
                        verbose = seuratVerbose, ...
   )
