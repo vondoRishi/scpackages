@@ -1,6 +1,6 @@
 Package: scpackages
 Type: Package
-Title: scpackages has many single-cell R and python packages to make easier to use them easily.
+Title: scpackages has many single-cell R and python packages to use them easily.
 Version: 0.2.7
 Author: Rishi Das Roy <rishi.dasroy@gmail.com>
 Maintainer: Rishi Das Roy <rishi.dasroy@helsinki.fi>
