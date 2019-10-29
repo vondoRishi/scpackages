@@ -81,4 +81,5 @@ findSimilarClusterSolution <- function(Object, identPrefix, similarityCut){
     Object@misc$cluster_G1 <- graph.adjacency(df.dist_lou, mode = "undirected", weighted = TRUE, diag = TRUE)
 
     Object@misc$clusterlouvain <- cluster_louvain(G1)
+    return(Object)
 }
