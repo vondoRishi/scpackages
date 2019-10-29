@@ -20,7 +20,6 @@ gridFindClusters <- function(Object,pcRange,resolutionRange, identPrefix) {
         }
     }
     print("loop ends")
-
     # Object@misc$data_NClust <- res_Nclust(Object,pcRange,resolutionRange, identPrefix)
     return(Object)
 }
