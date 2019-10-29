@@ -79,7 +79,7 @@ findSimilarClusterSolution <- function(Object, identPrefix, similarityCut){
     # pheatmap::pheatmap(df.dist_lou,cluster_rows = F, cluster_cols = F, show_colnames = TRUE)
 
     Object@misc$cluster_G1 <- graph.adjacency(df.dist_lou, mode = "undirected", weighted = TRUE, diag = TRUE)
-
     Object@misc$clusterlouvain <- cluster_louvain(Object@misc$cluster_G1)
+
     return(Object)
 }
