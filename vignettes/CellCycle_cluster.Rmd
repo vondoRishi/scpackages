@@ -39,7 +39,6 @@ seuratObj <- normScaleHVG(seuratObj,seuratVerbose = FALSE,nfeatures=1000)
 ## CellCycle 
 Next we will check 
 ```{r CellCycle,message=FALSE,warning=FALSE,fig.width=8,fig.height=6}
-# cell_cycle_genes <- read.csv("inst/extdata/cell_cycle_genes.csv")
 library(readr)
 cell_cycle_genes <- read_csv(system.file("extdata", "cell_cycle_genes.csv", package = "scpackages"))
 cell_cycle_genes

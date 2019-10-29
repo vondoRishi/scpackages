@@ -300,6 +300,16 @@ renameCluster <- function(ClusterInfo, Object, topN=10) {
 }
 
 
+#' Title
+#'
+#' @param Object
+#'
+#' @return
+#' @export
+#'
+#' @import dplyr
+#'
+#' @examples
 pca_gene_loading <- function(Object) {
   raw_pca_loading <- Loadings(Object[["pca"]])
   max_pc<-colnames(raw_pca_loading)[apply(abs(raw_pca_loading),1,which.max)]
