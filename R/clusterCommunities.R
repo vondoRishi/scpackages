@@ -46,14 +46,14 @@ res_Nclust <- function(Object,pcRange,resolutionRange, identPrefix) {
         for (resX in resolutionRange) {
             colX = paste(identPrefix, pc, resX, sep = "_")
             # print(max(levels( scaled_cluster[[]][,colX])))
-            res_Nclust <- rbind(res_Nclust,
+            result <- rbind(result,
                                 data.frame(
                                     cluster_id = colX,
                                     pc = pc,
                                     res = resX,
-                                    Num_Clus = (1 + as.numeric(max(
+                                    Num_Clus = (1 + max(
                                         as.numeric(levels(Object[[]][, colX]))
-                                    ) ) )
+                                    ) )
                       ))
         }
     }
