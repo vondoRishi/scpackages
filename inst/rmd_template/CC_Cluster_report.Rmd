@@ -10,6 +10,14 @@ params:
 title: "`r paste(params$set_title)`"
 ---
 
+```{css, echo=FALSE}
+.scroll-100 {
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: inherit;
+}
+```
+
 # Clustering 
 ## Highly variable features
 
@@ -18,10 +26,11 @@ obj_scRNA@misc$hvgPlot
 ```
 
 <button class="btn btn-primary" data-toggle="collapse" data-target="#BlockName"> Show/Hide </button>  List of selected variable genes.
-<div id="BlockName" class="collapse">  
+<div id="BlockName" class="collapse"  >  
 
-```{r VariableFeatures,echo=FALSE}
-VariableFeatures(object = obj_scRNA)
+```{r VariableFeatures,echo=FALSE,message=FALSE, class.output="scroll-100"}
+x <- VariableFeatures(object = obj_scRNA)
+print(x)
 ```
 
 </div>   
@@ -53,7 +62,7 @@ obj_scRNA@misc$after_cc_pca
 obj_scRNA@misc$elbowPlot
 ```
 
-#### Max `r obj_scRNA@misc$maxPca` principal component and resolution `r obj_scRNA@misc$resolution` selected.
+#### 0,0Max `r obj_scRNA@misc$maxPca` principal component and resolution `r obj_scRNA@misc$resolution` selected.
 
 ### Dimensional reduction
 
@@ -61,6 +70,8 @@ obj_scRNA@misc$elbowPlot
 obj_scRNA@misc$umapPlot
 if(!is.null(obj_scRNA@misc$markers_info) ){
   DT::datatable(round_df(obj_scRNA@misc$markers_info,digits = 6), rownames = FALSE)
+}else{
+  print("Cluster markers are not found")
 }
 ```
 
@@ -69,9 +80,19 @@ if(!is.null(obj_scRNA@misc$markers_info) ){
 ### Command History
 
 <button class="btn btn-primary" data-toggle="collapse" data-target="#blockHis"> Show/Hide </button>  List of selected variable genes.
-<div id="blockHis" class="collapse">  
-```{r history,echo=FALSE,message=FALSE}
+<div id="blockHis"  class="collapse">  
+```{r history,echo=FALSE,message=FALSE,class.output="scroll-100"}
 obj_scRNA@commands
+```
+
+</div>
+
+### Session Info
+
+<button class="btn btn-primary" data-toggle="collapse" data-target="#blockSesn"> Show/Hide </button>  List of selected variable genes.
+<div id="blockSesn"  class="collapse">  
+```{r sessn,echo=FALSE,message=FALSE,class.output="scroll-100"}
+sessionInfo()
 ```
 
 </div>

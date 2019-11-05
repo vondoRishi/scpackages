@@ -65,7 +65,7 @@ res_Nclust <- function(Object,pcRange,resolutionRange, identPrefix) {
 #' @return
 #' @export
 #'
-#' @import clues igraph
+#' @import clues igraph usedist
 #'
 #' @examples
 findSimilarClusterSolution <- function(Object, identPrefix, similarityCut){
@@ -73,10 +73,8 @@ findSimilarClusterSolution <- function(Object, identPrefix, similarityCut){
     invert_adjustedRand <- function(v1, v2){  clues::adjustedRand(v1,v2)["HA"] }
     cluster_dist <- usedist::dist_make(cluster_results,invert_adjustedRand,"Adjusted rand index")
 
-
     df.dist_lou <- as.matrix(cluster_dist, labels=TRUE)
     df.dist_lou[df.dist_lou < similarityCut] =0
-    # pheatmap::pheatmap(df.dist_lou,cluster_rows = F, cluster_cols = F, show_colnames = TRUE)
 
     Object@misc$cluster_G1 <- graph.adjacency(df.dist_lou, mode = "undirected", weighted = TRUE, diag = TRUE)
     Object@misc$clusterlouvain <- cluster_louvain(Object@misc$cluster_G1)
