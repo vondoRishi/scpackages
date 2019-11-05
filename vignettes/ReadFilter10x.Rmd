@@ -1,6 +1,6 @@
 ---
 title: "Read and Filter 10x data"
-output: rmarkdown::html_vignette
+output: prettydoc::html_pretty
 vignette: >
   %\VignetteIndexEntry{ReadFilter10x}
   %\VignetteEngine{knitr::rmarkdown}

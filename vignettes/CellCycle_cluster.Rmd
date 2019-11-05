@@ -1,13 +1,13 @@
 ---
 title: "Process Seurat Object"
-output: rmarkdown::html_vignette
+output: prettydoc::html_pretty
 vignette: >
   %\VignetteIndexEntry{CellCycle_cluster}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup,message=FALSE}
+```{r setup,message=FALSE,warning=FALSE}
 library(scpackages)
 ```
 
@@ -35,6 +35,14 @@ Here in this example __nfeatures__ belongs to **VariableFeatures** .
 ```{r normScaleHVG,warning=FALSE,fig.width=8,fig.height=6}
 seuratObj <- normScaleHVG(seuratObj,seuratVerbose = FALSE,nfeatures=1000)
 ```
+
+To save the variance info of all the genes in a csv file. 
+```{r hvg_info,eval=FALSE}
+tmp_hvf <-HVFInfo(seuratObj)
+tmp_hvf$Symbol <- rownames(tmp_hvf)
+write.csv(tmp_hvf, file = "HVF_info.csv",row.names = FALSE)
+```
+
 
 ## CellCycle 
 Next we will check 
@@ -92,8 +100,13 @@ markers_info <-  FindAllMarkers( object = seuratObj,
                                  only.pos = TRUE, min.pct = 0.25,
                                  thresh.use = 0.25, verbose = FALSE )
 head(markers_info)
+seuratObj@misc$markers_info <- markers_info
 ```
 
+To save the **markers_info** in a csv file. 
+```{r echo=TRUE,eval=FALSE}
+write.csv(markers_info, file = "cluster_markers.csv",row.names = FALSE)
+```
 
 
 #### Cell type information
