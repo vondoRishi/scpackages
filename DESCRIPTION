@@ -25,3 +25,7 @@ BugReports: https://github.com/vondoRishi/scpackages/issues
 Suggests: 
     knitr
 VignetteBuilder: knitr
+Imports: 
+    clues,
+    igraph,
+    usedist
