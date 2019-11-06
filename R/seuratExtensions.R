@@ -157,10 +157,10 @@ filterSeurat <-
     x<-  subset(Object[[]],
                 percent.mito > min(mito.range) &
                   percent.mito < max(mito.range) &
-                  nCount_RNA > min(gene_range) &
-                  nCount_RNA < max(gene_range) &
-                  nFeature_RNA > min(umi_range) &
-                  nFeature_RNA < max(umi_range)
+                  nCount_RNA > min(umi_range) &
+                  nCount_RNA < max(umi_range) &
+                  nFeature_RNA > min(gene_range) &
+                  nFeature_RNA < max(gene_range)
     )
     Object <- subset( Object, cells= rownames(x))
     Object@misc$messages <- c(Object@misc$messages, paste("After filter ",capture.output(show(Object))[2],collapse = "") )
