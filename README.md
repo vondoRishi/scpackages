@@ -31,18 +31,6 @@ This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(scpackages)
-#> Warning: replacing previous import 'DT::JS' by 'Seurat::JS' when loading
-#> 'scpackages'
-#> Warning: replacing previous import 'cowplot::get_legend' by
-#> 'ggpubr::get_legend' when loading 'scpackages'
-#> Warning: replacing previous import 'dplyr::union' by 'igraph::union' when
-#> loading 'scpackages'
-#> Warning: replacing previous import 'dplyr::as_data_frame' by
-#> 'igraph::as_data_frame' when loading 'scpackages'
-#> Warning: replacing previous import 'dplyr::groups' by 'igraph::groups' when
-#> loading 'scpackages'
-#> Warning: replacing previous import 'igraph::crossing' by 'tidyr::crossing'
-#> when loading 'scpackages'
 ## basic example code
 ```
 

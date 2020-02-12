@@ -38,7 +38,7 @@ devtools::install_github("vondoRishi/scpackages")
 
 This is a basic example which shows you how to solve a common problem:
 
-```{r example}
+```{r example,warning=FALSE}
 library(scpackages)
 ## basic example code
 ```
