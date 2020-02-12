@@ -69,7 +69,8 @@ obj_scRNA@misc$elbowPlot
 ```{r dim_reduc,echo=FALSE}
 obj_scRNA@misc$umapPlot
 if(!is.null(obj_scRNA@misc$markers_info) ){
-  DT::datatable(round_df(obj_scRNA@misc$markers_info,digits = 6), rownames = FALSE)
+  # DT::datatable(round_df(obj_scRNA@misc$markers_info,digits = 6), rownames = FALSE)
+  DT::datatable(obj_scRNA@misc$markers_info, rownames = FALSE)
 }else{
   print("Cluster markers are not found")
 }

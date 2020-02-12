@@ -1,14 +1,46 @@
 ---
-title: "Read and Filter 10x data"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{ReadFilter10x}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output: github_document
 ---
 
-```{r setup,message=FALSE,warning=FALSE}
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# scpackages
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of scpackages is to ...
+
+## Installation
+
+You can install the released version of scpackages from [CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("scpackages")
+```
+
+And the development version from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("vondoRishi/scpackages")
+```
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
 library(scpackages)
+## basic example code
 ```
 
 In this example we use the 10x data dowloaded from [here](https://support.10xgenomics.com/single-cell-gene-expression/datasets/2.1.0/neurons_900)
@@ -48,13 +80,3 @@ report_QC(obj_scRNA = seurat_Obj,title = "1k_Brain_E18_Mm")
 ```
 
 This will generate **1k_Brain_E18_Mm_currentDate.nb.html** report with all information and figures. Additionally, it will also save **seurat_Obj** as 1k_Brain_E18_Mm_currentDate.rds for future use.
-
-### Session Info
-
-<button class="btn btn-primary" data-toggle="collapse" data-target="#blockSesn"> Show/Hide </button>  List of selected variable genes.
-<div id="blockSesn"  class="collapse">  
-```{r sessn,echo=FALSE,message=FALSE,class.output="scroll-100"}
-sessionInfo()
-```
-
-</div>

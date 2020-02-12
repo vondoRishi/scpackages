@@ -9,6 +9,9 @@ pca_gene_loading(Object)
 \arguments{
 \item{Object}{}
 }
+\value{
+
+}
 \description{
 Title
 }

@@ -9,6 +9,9 @@ qc_regress_CellCycle(Object, CellCycle_genes)
 \arguments{
 \item{CellCycle_genes}{}
 }
+\value{
+
+}
 \description{
 Title
 }

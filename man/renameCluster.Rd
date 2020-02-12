@@ -9,6 +9,9 @@ renameCluster(ClusterInfo, Object, topN = 10)
 \arguments{
 \item{Object}{}
 }
+\value{
+
+}
 \description{
 Title
 }

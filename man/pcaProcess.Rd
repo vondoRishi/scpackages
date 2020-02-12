@@ -9,6 +9,9 @@ pcaProcess(Object, features, jackStraw = FALSE)
 \arguments{
 \item{jackStraw}{}
 }
+\value{
+
+}
 \description{
 Title
 }

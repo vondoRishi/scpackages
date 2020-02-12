@@ -31,9 +31,16 @@ There are three steps need to do at first ; which are
 These steps can be done by a single method with default values. It will also genarate **VariableFeaturePlot**. Only the variable features will be scaled as those are only required as input for PCA. 
 
 **Note** We can pass any parameter of above "Seurat" functions to below function. 
-Here in this example __nfeatures__ belongs to **VariableFeatures** .
+Here in this example __nfeatures__ belongs to __Seurat__ function **VariableFeatures** .
 ```{r normScaleHVG,warning=FALSE,fig.width=8,fig.height=6}
 seuratObj <- normScaleHVG(seuratObj,seuratVerbose = FALSE,nfeatures=1000)
+```
+
+To save the variance info of all the genes in a csv file. 
+```{r hvg_info,eval=FALSE}
+tmp_hvf <-HVFInfo(seuratObj)
+tmp_hvf$Symbol <- rownames(tmp_hvf)
+write.csv(tmp_hvf, file = "HVF_info.csv",row.names = FALSE)
 ```
 
 ## CellCycle 
@@ -93,8 +100,14 @@ markers_info <-  FindAllMarkers( object = seuratObj,
                                  only.pos = TRUE, min.pct = 0.25,
                                  thresh.use = 0.25, verbose = FALSE )
 head(markers_info)
+# Storing the info , this table will be printed when executing "report_Cluster" function at the end.
+seuratObj@misc$markers_info <- markers_info
 ```
 
+To save the **markers_info** in a csv file. 
+```{r echo=TRUE,eval=FALSE}
+write.csv(markers_info, file = "cluster_markers.csv",row.names = FALSE)
+```
 
 
 #### Cell type information
@@ -113,7 +126,7 @@ markers_info <- left_join(markers_info,marker_gene,
                           by = c("gene" = "Symbol")) %>% 
     replace_na(list(Gene_type = "Non skin"))
 
-# Storing the info 
+# Storing the info , this table will be printed when executing "report_Cluster" function at the end.
 seuratObj@misc$markers_info <- markers_info
 
 ```

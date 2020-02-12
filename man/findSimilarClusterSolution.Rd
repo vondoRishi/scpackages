@@ -6,6 +6,9 @@
 \usage{
 findSimilarClusterSolution(Object, identPrefix, similarityCut)
 }
+\value{
+
+}
 \description{
 Title
 }

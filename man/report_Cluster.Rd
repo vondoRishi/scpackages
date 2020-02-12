@@ -9,6 +9,9 @@ report_Cluster(obj_scRNA, title)
 \arguments{
 \item{title}{}
 }
+\value{
+
+}
 \description{
 Title
 }

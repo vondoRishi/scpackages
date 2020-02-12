@@ -9,6 +9,9 @@ QC_plot(Object, group.by = NULL)
 \arguments{
 \item{group.by}{}
 }
+\value{
+
+}
 \description{
 Title
 }

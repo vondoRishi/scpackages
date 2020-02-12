@@ -9,6 +9,9 @@ report_QC(obj_scRNA, title)
 \arguments{
 \item{title}{}
 }
+\value{
+
+}
 \description{
 Title
 }

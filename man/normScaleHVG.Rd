@@ -9,6 +9,9 @@ normScaleHVG(Object, seuratVerbose = TRUE, ...)
 \arguments{
 \item{Object}{}
 }
+\value{
+
+}
 \description{
 Title
 }

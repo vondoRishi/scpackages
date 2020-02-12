@@ -4,11 +4,18 @@
 \alias{filterSeurat}
 \title{Title}
 \usage{
-filterSeurat(Object, mito.range = c(0, 100), gene_range = c(0, Inf),
-  umi_range = c(0, Inf))
+filterSeurat(
+  Object,
+  mito.range = c(0, 100),
+  gene_range = c(0, Inf),
+  umi_range = c(0, Inf)
+)
 }
 \arguments{
 \item{umi_range}{}
+}
+\value{
+
 }
 \description{
 Title

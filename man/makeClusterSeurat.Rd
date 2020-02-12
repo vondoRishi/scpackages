@@ -9,6 +9,9 @@ makeClusterSeurat(Object, maxDims, res, identName = NULL)
 \arguments{
 \item{identName}{}
 }
+\value{
+
+}
 \description{
 Title
 }

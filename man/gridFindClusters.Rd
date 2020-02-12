@@ -9,6 +9,9 @@ gridFindClusters(Object, pcRange, resolutionRange, identPrefix)
 \arguments{
 \item{identPrefix}{}
 }
+\value{
+
+}
 \description{
 Title
 }

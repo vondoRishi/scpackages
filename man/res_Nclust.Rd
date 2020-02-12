@@ -9,6 +9,9 @@ res_Nclust(Object, pcRange, resolutionRange, identPrefix)
 \arguments{
 \item{identPrefix}{}
 }
+\value{
+
+}
 \description{
 Title
 }
