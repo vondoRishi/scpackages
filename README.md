@@ -7,8 +7,10 @@
 
 <!-- badges: end -->
 
-The goal of scpackages is to
-…
+The goal of scpackages is to integrate different R packages to perform
+single cell RNA-seq analysis easily with minimum instructions. At
+present it is based on only
+[Seurat](https://satijalab.org/seurat/)
 
 ## Installation
 
