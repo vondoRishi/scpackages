@@ -1,14 +1,18 @@
-## ----setup,message=FALSE-------------------------------------------------
+## ----setup,message=FALSE,warning=FALSE-----------------------------------
 library(scpackages)
 
 ## ----readSeurat,warning=FALSE,fig.width=8,fig.height=6-------------------
-seuratObj <- readRDS("/home/dasroy/data/Project/scpackages/1k_Brain_E18_Mm.23_October_2019.rds")
+seuratObj <- readRDS("/home/dasroy/data/Project/scpackages/1k_Brain_E18_Mm.12_February_2020.rds")
 
 ## ----normScaleHVG,warning=FALSE,fig.width=8,fig.height=6-----------------
 seuratObj <- normScaleHVG(seuratObj,seuratVerbose = FALSE,nfeatures=1000)
 
+## ----hvg_info,eval=FALSE-------------------------------------------------
+#  tmp_hvf <-HVFInfo(seuratObj)
+#  tmp_hvf$Symbol <- rownames(tmp_hvf)
+#  write.csv(tmp_hvf, file = "HVF_info.csv",row.names = FALSE)
+
 ## ----CellCycle,message=FALSE,warning=FALSE,fig.width=8,fig.height=6------
-# cell_cycle_genes <- read.csv("inst/extdata/cell_cycle_genes.csv")
 library(readr)
 cell_cycle_genes <- read_csv(system.file("extdata", "cell_cycle_genes.csv", package = "scpackages"))
 cell_cycle_genes
@@ -29,6 +33,10 @@ markers_info <-  FindAllMarkers( object = seuratObj,
                                  only.pos = TRUE, min.pct = 0.25,
                                  thresh.use = 0.25, verbose = FALSE )
 head(markers_info)
+seuratObj@misc$markers_info <- markers_info
+
+## ----echo=TRUE,eval=FALSE------------------------------------------------
+#  write.csv(markers_info, file = "cluster_markers.csv",row.names = FALSE)
 
 ## ----Dummy,message=FALSE,warning=FALSE,fig.width=8,fig.height=6----------
 marker_gene <- read_csv("/home/dasroy/data/Project/GeneExpression/scrna_workflow/marker_genes.csv")
@@ -49,5 +57,5 @@ seuratObj@misc$markers_info <- markers_info
 seuratObj <- renameCluster(ClusterInfo = markers_info, Object = seuratObj)
 
 ## ----report,message=FALSE,warning=FALSE,fig.width=8,fig.height=6---------
-report_Cluster(obj_scRNA = seuratObj,title = "scaled_cluster")
+report_Cluster(obj_scRNA = seuratObj,title = "../scaled_cluster")
 

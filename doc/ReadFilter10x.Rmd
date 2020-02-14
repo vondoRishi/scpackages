@@ -1,6 +1,6 @@
 ---
 title: "Read and Filter 10x data"
-output: rmarkdown::html_vignette
+output: prettydoc::html_pretty
 vignette: >
   %\VignetteIndexEntry{ReadFilter10x}
   %\VignetteEngine{knitr::rmarkdown}
@@ -48,13 +48,3 @@ report_QC(obj_scRNA = seurat_Obj,title = "1k_Brain_E18_Mm")
 ```
 
 This will generate **1k_Brain_E18_Mm_currentDate.nb.html** report with all information and figures. Additionally, it will also save **seurat_Obj** as 1k_Brain_E18_Mm_currentDate.rds for future use.
-
-### Session Info
-
-<button class="btn btn-primary" data-toggle="collapse" data-target="#blockSesn"> Show/Hide </button>  List of selected variable genes.
-<div id="blockSesn"  class="collapse">  
-```{r sessn,echo=FALSE,message=FALSE,class.output="scroll-100"}
-sessionInfo()
-```
-
-</div>

@@ -1,13 +1,13 @@
 ---
 title: "Process Seurat Object"
-output: rmarkdown::html_vignette
+output: prettydoc::html_pretty
 vignette: >
   %\VignetteIndexEntry{CellCycle_cluster}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup,message=FALSE}
+```{r setup,message=FALSE,warning=FALSE}
 library(scpackages)
 ```
 
@@ -17,7 +17,7 @@ library(scpackages)
 First we will load saved seurat object from disk.
 
 ```{r readSeurat,warning=FALSE,fig.width=8,fig.height=6}
-seuratObj <- readRDS("/home/dasroy/data/Project/scpackages/1k_Brain_E18_Mm.23_October_2019.rds")
+seuratObj <- readRDS("/home/dasroy/data/Project/scpackages/1k_Brain_E18_Mm.12_February_2020.rds")
 ```
 
 
@@ -31,7 +31,7 @@ There are three steps need to do at first ; which are
 These steps can be done by a single method with default values. It will also genarate **VariableFeaturePlot**. Only the variable features will be scaled as those are only required as input for PCA. 
 
 **Note** We can pass any parameter of above "Seurat" functions to below function. 
-Here in this example __nfeatures__ belongs to __Seurat__ function **VariableFeatures** .
+Here in this example __nfeatures__ belongs to **VariableFeatures** .
 ```{r normScaleHVG,warning=FALSE,fig.width=8,fig.height=6}
 seuratObj <- normScaleHVG(seuratObj,seuratVerbose = FALSE,nfeatures=1000)
 ```
@@ -43,10 +43,10 @@ tmp_hvf$Symbol <- rownames(tmp_hvf)
 write.csv(tmp_hvf, file = "HVF_info.csv",row.names = FALSE)
 ```
 
+
 ## CellCycle 
 Next we will check 
 ```{r CellCycle,message=FALSE,warning=FALSE,fig.width=8,fig.height=6}
-# cell_cycle_genes <- read.csv("inst/extdata/cell_cycle_genes.csv")
 library(readr)
 cell_cycle_genes <- read_csv(system.file("extdata", "cell_cycle_genes.csv", package = "scpackages"))
 cell_cycle_genes
@@ -100,7 +100,6 @@ markers_info <-  FindAllMarkers( object = seuratObj,
                                  only.pos = TRUE, min.pct = 0.25,
                                  thresh.use = 0.25, verbose = FALSE )
 head(markers_info)
-# Storing the info , this table will be printed when executing "report_Cluster" function at the end.
 seuratObj@misc$markers_info <- markers_info
 ```
 
@@ -126,7 +125,7 @@ markers_info <- left_join(markers_info,marker_gene,
                           by = c("gene" = "Symbol")) %>% 
     replace_na(list(Gene_type = "Non skin"))
 
-# Storing the info , this table will be printed when executing "report_Cluster" function at the end.
+# Storing the info 
 seuratObj@misc$markers_info <- markers_info
 
 ```
@@ -143,6 +142,6 @@ We used genes which should express in developing skin and hence all the clusters
 It will genarate report and save seuratObj with filenames begining with **title** and ending with date_stamp.
 
 ```{r report,message=FALSE,warning=FALSE,fig.width=8,fig.height=6}
-report_Cluster(obj_scRNA = seuratObj,title = "scaled_cluster")
+report_Cluster(obj_scRNA = seuratObj,title = "../scaled_cluster")
 ```
 
