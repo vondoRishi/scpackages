@@ -11,11 +11,11 @@
 #' @import Seurat
 #'
 #' @examples
-gridFindClusters <- function(Object,pcRange,resolutionRange, identPrefix) {
+gridFindClusters <- function(Object,pcRange,resolutionRange, identPrefix, ...) {
     for (pc in pcRange) {
-        Object <- FindNeighbors(Object, dims = 1:pc)
+        Object <- FindNeighbors(Object, dims = 1:pc, ...)
         for (resX in resolutionRange) {
-            Object <- FindClusters(Object, resolution = resX, verbose = FALSE)
+            Object <- FindClusters(Object, resolution = resX,...)
             Object[[paste(identPrefix, pc, resX, sep = "_")]]<- Idents(Object)
         }
     }
@@ -39,18 +39,17 @@ gridFindClusters <- function(Object,pcRange,resolutionRange, identPrefix) {
 #' @examples
 res_Nclust <- function(Object,pcRange,resolutionRange, identPrefix) {
     result <-data.frame(  cluster_id = character(),
-                          pc = numeric(), res = numeric(), Num_Clus = numeric()
+                          pc = numeric(), resolution = numeric(), Cell_types = numeric()
         )
     for (pc in pcRange) {
         for (resX in resolutionRange) {
             colX = paste(identPrefix, pc, resX, sep = "_")
-            # print(max(levels( scaled_cluster[[]][,colX])))
             result <- rbind(result,
                                 data.frame(
                                     cluster_id = colX,
                                     pc = pc,
-                                    res = resX,
-                                    Num_Clus = (1 + max(
+                                    resolution = resX,
+                                    Cell_types = (1 + max(
                                         as.numeric(levels(Object[[]][, colX]))
                                     ) )
                       ))
@@ -79,5 +78,18 @@ findSimilarClusterSolution <- function(Object, identPrefix, similarityCut){
     Object@misc$cluster_G1 <- graph.adjacency(df.dist_lou, mode = "undirected", weighted = TRUE, diag = TRUE)
     Object@misc$clusterlouvain <- cluster_louvain(Object@misc$cluster_G1)
 
+    meta_cluster <- data.frame(
+            cluster_id = Object@misc$clusterlouvain$names,
+            membership = Object@misc$clusterlouvain$membership
+        )
+
+    meta_cluster <- meta_cluster %>% separate(cluster_id,
+                                  c("id_x", "pca", "resolution"),
+                                  sep = "_",
+                                  remove = FALSE) %>% select(-id_x)
+
+
+    Object@misc$meta_cluster <-
+        meta_cluster %>% left_join(Object@misc$data_NClust[, c("cluster_id", "Cell_types")])
     return(Object)
 }

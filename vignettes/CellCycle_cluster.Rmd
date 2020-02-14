@@ -17,7 +17,7 @@ library(scpackages)
 First we will load saved seurat object from disk.
 
 ```{r readSeurat,warning=FALSE,fig.width=8,fig.height=6}
-seuratObj <- readRDS("/home/dasroy/data/Project/scpackages/1k_Brain_E18_Mm.23_October_2019.rds")
+seuratObj <- readRDS("/home/dasroy/data/Project/scpackages/1k_Brain_E18_Mm.12_February_2020.rds")
 ```
 
 
@@ -142,6 +142,6 @@ We used genes which should express in developing skin and hence all the clusters
 It will genarate report and save seuratObj with filenames begining with **title** and ending with date_stamp.
 
 ```{r report,message=FALSE,warning=FALSE,fig.width=8,fig.height=6}
-report_Cluster(obj_scRNA = seuratObj,title = "scaled_cluster")
+report_Cluster(obj_scRNA = seuratObj,title = "../scaled_cluster")
 ```
 

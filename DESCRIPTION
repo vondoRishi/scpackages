@@ -1,7 +1,7 @@
 Package: scpackages
 Type: Package
 Title: scpackages has many single-cell R and python packages to use them easily.
-Version: 0.2.10
+Version: 0.2.11
 Author: Rishi Das Roy <rishi.dasroy@gmail.com>
 Maintainer: Rishi Das Roy <rishi.dasroy@helsinki.fi>
 Description: Integrates common single cell R and Python packages in one place.
@@ -28,4 +28,6 @@ VignetteBuilder: knitr
 Imports: 
     clues,
     igraph,
-    usedist
+    usedist,
+    easyalluvial,
+    ggrepel
