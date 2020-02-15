@@ -1,0 +1,142 @@
+---
+title: "Find unique clusterSolutions"
+output: prettydoc::html_pretty
+vignette: >
+  %\VignetteIndexEntry{Find_uniq_clusterSolutions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup,message=FALSE,warning=FALSE}
+library(scpackages)
+```
+
+
+## Load Seurat Object 
+
+First we will load a scaled and normalized seurat object from disk.
+
+```{r readSeurat,warning=FALSE,fig.width=8,fig.height=6}
+scaled_cluster <- readRDS("../scaled_cluster.13_February_2020.rds")
+```
+
+## Gene ~ PC
+
+Which genes are loaded in which principal component?
+
+```{r gene_p,warning=FALSE,fig.width=8,fig.height=6}
+tmp_hvf <-HVFInfo(scaled_cluster)
+tmp_hvf$Symbol <- rownames(tmp_hvf)
+# write.csv(tmp_hvf, file = "HVF_info.csv",row.names = FALSE)
+
+## gene PCA Explore ##
+scaled_cluster@misc$loading <- scpackages::pca_gene_loading(scaled_cluster)
+scaled_cluster@misc$loading <-
+  scaled_cluster@misc$loading %>% left_join(tmp_hvf, by = "Symbol")
+
+library(ggrepel)
+
+ggplot(scaled_cluster@misc$loading, 
+       aes(x=factor(pca_fix),y=variance.standardized, label = Symbol)) +
+  geom_point(color = ifelse(scaled_cluster@misc$loading$variance.standardized > 4 
+                            , "red", "black")) +
+  geom_text_repel(
+    data = subset(scaled_cluster@misc$loading, variance.standardized > 6 )
+  )+ggtitle(label = "Visualize the gene loading in each PCA ")
+```
+
+## Parameters
+
+There are two parameters pca and resolution along with number of HVGs which controls number of cell types (cluster) 
+### Elbow plot 
+
+```{r param,warning=FALSE,fig.width=8,fig.height=6}
+
+scaled_cluster@misc$elbowPlot+ggtitle("Where is the elbow")
+## ??Where is the elbow does it matters ??
+```
+
+What are the optimal number of PC and resolution value?
+
+```{r optimal_param,warning=FALSE,fig.width=8,fig.height=6}
+pcRange <- seq(15,25,by = 2)
+resolutionRange <- seq(0.4,1.2,by = 0.2)
+
+scaled_cluster <- scpackages::gridFindClusters( Object = scaled_cluster, 
+                                                pcRange, resolutionRange,
+                                                identPrefix = "solution", 
+                                                verbose =FALSE)
+
+ggplot(scaled_cluster@misc$data_NClust,
+       aes(x = resolution, y = Cell_types)) + geom_line() + facet_wrap(. ~ pc)
+```
+
+#### Keeping "PCA" constant, higher resolution provides higher number of cell types
+#### Increasing number of PCA decreases max number of cell types
+
+### With 17 PCA , resolution (0.4, 0.6,0.8) produces 6, 8 and 9 clusters  
+### Are they belong to same solution?  
+```{r vis_solution,warning=FALSE,fig.width=8,fig.height=6}
+library(easyalluvial)
+alluvial_wide(dplyr::select(
+  scaled_cluster[[]],
+  solution_17_0.4,
+  solution_17_0.6,
+  solution_17_0.8
+)) + theme_bw()
+```
+
+
+## Cluster the similar solutions?
+
+```{r group_clusters,warning=FALSE,fig.width=8,fig.height=6}
+scaled_cluster <-  scpackages::findSimilarClusterSolution(scaled_cluster,
+                                         identPrefix = "solution",
+                                         similarityCut = 0.8)
+plot(scaled_cluster@misc$cluster_G1, vertex.color = 
+       rainbow(10, alpha = 0.8)[scaled_cluster@misc$clusterlouvain$membership])
+
+```
+
+## Look for same shape( number of cluster) with different color(solution) 
+
+
+```{r warning=FALSE,fig.width=8,fig.height=6}
+ggplot(  scaled_cluster@misc$meta_cluster,  aes(
+                y = resolution,
+                x = pca,
+                # shape = factor(Cell_types),
+                label = Cell_types,#membership,
+                color = factor(membership)
+              )
+)  + geom_text()
+#+  scale_color_manual(values =  rainbow(8)) #+  theme_dark()
+```
+
+#### Finding different solutions with same number of cell types.
+
+```{r warning=FALSE,fig.width=8,fig.height=6}
+cluster_representatives <- as_tibble( scaled_cluster@misc$meta_cluster %>% 
+                                        group_by(membership,Cell_types) %>% 
+                                        sample_n(1)) %>% arrange(pca,resolution)
+
+
+x <- as.list(cluster_representatives %>% 
+               filter( Cell_types==9 ) %>% 
+               select(cluster_id))
+alluvial_wide(scaled_cluster[[]][, as.character(x$cluster_id)]) + 
+  theme(axis.text.x =  element_text(angle = 90)) +
+  theme_bw() + 
+  ggtitle(paste(    length(x$cluster_id),
+    " different solutions with equal number of clusters"
+  ))
+```
+
+Here, we can see there are 4 different clustering solutions although each of them give exact 9 cell types. For further discussion, **solution_15_0.8** is marked as reference set. Now the cell_types 3, 5, 6, 7 and 8 are always intact. Although, other cell_types are not constant in different solutions, but after subdividing into sub-group they remain **mostly** together.
