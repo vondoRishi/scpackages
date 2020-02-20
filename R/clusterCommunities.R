@@ -49,9 +49,8 @@ res_Nclust <- function(Object,pcRange,resolutionRange, identPrefix) {
                                     cluster_id = colX,
                                     pc = pc,
                                     resolution = resX,
-                                    Cell_types = (1 + max(
-                                        as.numeric(levels(Object[[]][, colX]))
-                                    ) )
+                                    Cell_types = length(levels(Object[[]][, colX]))
+
                       ))
         }
     }
