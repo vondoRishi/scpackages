@@ -69,7 +69,8 @@ res_Nclust <- function(Object,pcRange,resolutionRange, identPrefix) {
 #' @examples
 findSimilarClusterSolution <- function(Object, identPrefix, similarityCut){
     cluster_results <- t( Object[[]][, grep(identPrefix,colnames(Object[[]]))])
-    invert_adjustedRand <- function(v1, v2){  clues::adjustedRand(v1,v2)["HA"] }
+    invert_adjustedRand <- function(v1, v2){  clues::adjustedRand(as.numeric(factor(v1)),
+                                                                  as.numeric(factor(v2)))["HA"] }
     cluster_dist <- usedist::dist_make(cluster_results,invert_adjustedRand,"Adjusted rand index")
 
     df.dist_lou <- as.matrix(cluster_dist, labels=TRUE)

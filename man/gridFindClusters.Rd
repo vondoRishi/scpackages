@@ -4,7 +4,7 @@
 \alias{gridFindClusters}
 \title{Title}
 \usage{
-gridFindClusters(Object, pcRange, resolutionRange, identPrefix)
+gridFindClusters(Object, pcRange, resolutionRange, identPrefix, ...)
 }
 \arguments{
 \item{identPrefix}{}

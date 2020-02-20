@@ -29,12 +29,8 @@ read10XwithMarkergenes <-  function(tenxPath,
                              min.features = pMin.features,
                              project = projectName
                              )
-  AGG[["percent.mito"]] <- PercentageFeatureSet(AGG, pattern = mitoPattern)
-  for (genes in markerGenes) {
-    AGG[[paste("percent", genes, sep = ".")]] <-
-      PercentageFeatureSet(AGG, pattern = paste("^", genes, "$", sep = ""))
-  }
 
+  AGG <- customPercentageFeature(AGG, mitoPattern, markerGenes)
   AGG@misc$messages <-list()
   AGG@misc$messages <- str_c(AGG@misc$messages, paste("Data loaded from",tenxPath),collapse = " ")
   AGG@misc$messages <- c(AGG@misc$messages, paste(capture.output(show(AGG)),collapse = "") )
@@ -47,6 +43,25 @@ read10XwithMarkergenes <-  function(tenxPath,
   AGG <- QC_plot(AGG,group.by = group_by)
   print(AGG@misc$QC_plot)
   print(AGG@misc$QC_vln_plot)
+  return(AGG)
+}
+
+#' Title
+#'
+#' @param AGG
+#' @param mitoPattern
+#' @param markerGenes
+#'
+#' @return
+#' @export
+#'
+#' @examples
+customPercentageFeature <- function(AGG, mitoPattern, markerGenes) {
+  AGG[["percent.mito"]] <- PercentageFeatureSet(AGG, pattern = mitoPattern)
+  for (genes in markerGenes) {
+    AGG[[paste("percent", genes, sep = ".")]] <-
+      PercentageFeatureSet(AGG, pattern = paste("^", genes, "$", sep = ""))
+  }
   return(AGG)
 }
 
