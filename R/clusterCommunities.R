@@ -11,15 +11,21 @@
 #' @import Seurat
 #'
 #' @examples
-gridFindClusters <- function(Object,pcRange,resolutionRange, identPrefix, ...) {
-    for (pc in pcRange) {
-        Object <- FindNeighbors(Object, dims = 1:pc, ...)
-        for (resX in resolutionRange) {
-            Object <- FindClusters(Object, resolution = resX,...)
-            Object[[paste(identPrefix, pc, resX, sep = "_")]]<- Idents(Object)
+gridFindClusters <- function(Object,pcRange,resolutionRange, featureRange, identPrefix, ...) {
+    for (nFeature in featureRange) {
+        topGenes <- head(VariableFeatures(Object), nFeature)
+        Object <- pcaProcess(Object, features = topGenes, jackStraw = FALSE)
+
+        for (pc in pcRange) {
+            Object <- FindNeighbors(Object, dims = 1:pc, features = topGenes , ...)
+            for (resX in resolutionRange) {
+                Object <- FindClusters(Object, resolution = resX,...)
+                Object[[paste(identPrefix, nFeature, pc, resX, sep = "_")]]<- Idents(Object)
+            }
         }
     }
-    Object@misc$data_NClust <- res_Nclust(Object,pcRange,resolutionRange, identPrefix)
+
+    Object@misc$data_NClust <- res_Nclust(Object,pcRange,resolutionRange,featureRange, identPrefix)
     return(Object)
 }
 
@@ -37,23 +43,26 @@ gridFindClusters <- function(Object,pcRange,resolutionRange, identPrefix, ...) {
 #' @import Seurat
 #'
 #' @examples
-res_Nclust <- function(Object,pcRange,resolutionRange, identPrefix) {
-    result <-data.frame(  cluster_id = character(),
+res_Nclust <- function(Object,pcRange,resolutionRange, featureRange, identPrefix) {
+    result <-data.frame(  cluster_id = character(), feature = numeric(),
                           pc = numeric(), resolution = numeric(), Cell_types = numeric()
         )
-    for (pc in pcRange) {
-        for (resX in resolutionRange) {
-            colX = paste(identPrefix, pc, resX, sep = "_")
-            result <- rbind(result,
+    for (nFeature in featureRange) {
+        for (pc in pcRange) {
+            for (resX in resolutionRange) {
+                colX = paste(identPrefix, nFeature , pc, resX, sep = "_")
+                result <- rbind(result,
                                 data.frame(
+                                    feature = nFeature,
                                     cluster_id = colX,
                                     pc = pc,
                                     resolution = resX,
                                     Cell_types = length(levels(Object[[]][, colX]))
-
-                      ))
+                                ))
+            }
         }
     }
+
     return(result)
 }
 

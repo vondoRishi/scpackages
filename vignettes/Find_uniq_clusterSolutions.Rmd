@@ -66,16 +66,17 @@ scaled_cluster@misc$elbowPlot+ggtitle("Where is the elbow")
 What are the optimal number of PC and resolution value?
 
 ```{r optimal_param,warning=FALSE,fig.width=8,fig.height=6}
+featureRange <- seq(200,1000, by=400)
 pcRange <- seq(15,25,by = 2)
 resolutionRange <- seq(0.4,1.2,by = 0.2)
 
-scaled_cluster <- scpackages::gridFindClusters( Object = scaled_cluster, 
+scaled_cluster <- scpackages::gridFindClusters( Object = scaled_cluster, featureRange,
                                                 pcRange, resolutionRange,
                                                 identPrefix = "solution", 
                                                 verbose =FALSE)
 
 ggplot(scaled_cluster@misc$data_NClust,
-       aes(x = resolution, y = Cell_types)) + geom_line() + facet_wrap(. ~ pc)
+       aes(x = resolution, y = Cell_types, color=factor(feature) )) + geom_line() + facet_wrap(. ~ pc)
 ```
 
 #### Keeping "PCA" constant, higher resolution provides higher number of cell types
