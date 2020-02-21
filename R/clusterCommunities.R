@@ -26,7 +26,7 @@ gridFindClusters <- function(Object,pcRange,resolutionRange, featureRange, ident
     }
 
 
-    if (is.null(scaled_cluster@misc$data_NClust)) {
+    if (is.null(Object@misc$data_NClust)) {
         Object@misc$data_NClust <-
             res_Nclust(Object,
                        pcRange,
