@@ -25,7 +25,28 @@ gridFindClusters <- function(Object,pcRange,resolutionRange, featureRange, ident
         }
     }
 
-    Object@misc$data_NClust <- res_Nclust(Object,pcRange,resolutionRange,featureRange, identPrefix)
+
+    if (is.null(scaled_cluster@misc$data_NClust)) {
+        Object@misc$data_NClust <-
+            res_Nclust(Object,
+                       pcRange,
+                       resolutionRange,
+                       featureRange,
+                       identPrefix)
+    } else {
+        Object@misc$data_NClust <-
+            rbind(
+                Object@misc$data_NClust,
+                res_Nclust(
+                    Object,
+                    pcRange,
+                    resolutionRange,
+                    featureRange,
+                    identPrefix
+                )
+            )
+    }
+
     return(Object)
 }
 
@@ -93,7 +114,7 @@ findSimilarClusterSolution <- function(Object, identPrefix, similarityCut){
         )
 
     meta_cluster <- meta_cluster %>% separate(cluster_id,
-                                  c("id_x", "pca", "resolution"),
+                                  c("id_x","feature", "pca", "resolution"),
                                   sep = "_",
                                   remove = FALSE) %>% select(-id_x)
 
