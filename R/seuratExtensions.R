@@ -210,17 +210,18 @@ topFeatures <- function(Object, selection.method, topN) {
 #' @import Seurat
 #'
 #' @examples
-pcaProcess <- function(Object, features,jackStraw= FALSE ){
+pcaProcess <- function(Object, features,jackStraw= FALSE,... ){
   pDims = if(length(features) < 50 ) length(features) else 50
   Object <-RunPCA( Object,
-                   npcs = pDims, features = features
+                   npcs = pDims, features = features,...
   )
   if(jackStraw){
     print("performing jackstraw")
-    Object <- JackStraw(Object, num.replicate = 100, dims = pDims, verbose = FALSE)
-    Object <- ScoreJackStraw(Object, dims = 1:pDims)
+    Object <- JackStraw(Object, num.replicate = 100, dims = pDims, ...)
+    Object <- ScoreJackStraw(Object, dims = 1:pDims,...)
   }
-  Object@misc$elbowPlot <- ElbowPlot(Object,ndims = pDims)
+  Object@misc$elbowPlot <- ElbowPlot(Object,ndims = pDims)+
+    ggtitle(paste("features",features))
   print(Object@misc$elbowPlot)
   return(Object)
 }
@@ -403,22 +404,21 @@ qc_regress_CellCycle<- function(Object,CellCycle_genes) {
 #' @import Seurat
 #'
 #' @examples
-normScaleHVG <- function(Object,seuratVerbose =TRUE,...) {
+normScaleHVG <- function(Object,...) {
   # print("Normalizing")
   Object <- NormalizeData(Object,
-    normalization.method = "LogNormalize", verbose = seuratVerbose,
-    ...
+    normalization.method = "LogNormalize", ...
   )
 
-  Object <- FindVariableFeatures(Object,  verbose = seuratVerbose, ...)
-  variable_features <-VariableFeatures(Object)
+  Object <- FindVariableFeatures(Object,...)
+  variable_features <-VariableFeatures(Object,...)
   Object@misc$hvgPlot <- topVariableFeaturePlot(Object,10)
   print(Object@misc$hvgPlot)
 
   Object <-  ScaleData(Object,features = variable_features,
-                       vars.to.regress = c("percent.mito","nCount_RNA"),
-                       verbose = seuratVerbose, ...
+                       vars.to.regress = c("percent.mito","nCount_RNA"),...
   )
+  return(Object)
 }
 
 topVariableFeaturePlot <- function(Object, topN){

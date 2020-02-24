@@ -14,7 +14,7 @@
 gridFindClusters <- function(Object,pcRange,resolutionRange, featureRange, identPrefix, ...) {
     for (nFeature in featureRange) {
         topGenes <- head(VariableFeatures(Object), nFeature)
-        Object <- pcaProcess(Object, features = topGenes, jackStraw = FALSE)
+        Object <- pcaProcess(Object, features = topGenes, jackStraw = FALSE,...)
 
         for (pc in pcRange) {
             Object <- FindNeighbors(Object, dims = 1:pc, features = topGenes , ...)

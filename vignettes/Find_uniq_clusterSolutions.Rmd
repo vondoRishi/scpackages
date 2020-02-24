@@ -67,11 +67,12 @@ What are the optimal number of PC and resolution value?
 
 ```{r optimal_param,warning=FALSE,fig.width=8,fig.height=6}
 featureRange <- seq(200,1000, by=400)
-pcRange <- seq(15,25,by = 2)
-resolutionRange <- seq(0.4,1.2,by = 0.2)
+featureRange <- c(50,100)
+pcRange <- seq(15,25,by = 5)
+resolutionRange <- seq(0.4,1.2,by = 0.4)
 
-scaled_cluster <- scpackages::gridFindClusters( Object = scaled_cluster, featureRange,
-                                                pcRange, resolutionRange,
+scaled_cluster <- scpackages::gridFindClusters( Object = scaled_cluster, 
+                                                pcRange, resolutionRange, featureRange,
                                                 identPrefix = "solution", 
                                                 verbose =FALSE)
 
