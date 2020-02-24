@@ -221,7 +221,7 @@ pcaProcess <- function(Object, features,jackStraw= FALSE,... ){
     Object <- ScoreJackStraw(Object, dims = 1:pDims,...)
   }
   Object@misc$elbowPlot <- ElbowPlot(Object,ndims = pDims)+
-    ggtitle(paste("features",features))
+    ggtitle(paste("features",length(features)))
   print(Object@misc$elbowPlot)
   return(Object)
 }
@@ -405,7 +405,6 @@ qc_regress_CellCycle<- function(Object,CellCycle_genes) {
 #'
 #' @examples
 normScaleHVG <- function(Object,...) {
-  # print("Normalizing")
   Object <- NormalizeData(Object,
     normalization.method = "LogNormalize", ...
   )
@@ -425,5 +424,5 @@ topVariableFeaturePlot <- function(Object, topN){
   topGenes <- head(VariableFeatures(Object), topN)
 
   plot1 <- VariableFeaturePlot(Object)
-  return(LabelPoints(plot = plot1, points = topGenes, repel = TRUE))
+  return(LabelPoints(plot = plot1, points = topGenes, repel = TRUE, xnudge = 0, ynudge = 0))
 }
